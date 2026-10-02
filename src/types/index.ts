@@ -27,3 +27,5 @@ export interface AppSettings {
   echoCancellation: boolean;
   speechRecognitionEnabled: boolean;
 }
+
+export type MobileTab = 'voice' | 'transcript';

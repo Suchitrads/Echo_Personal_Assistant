@@ -32,10 +32,10 @@ const STARTERS = [
   },
 ];
 
-export const SuggestedStarters: React.FC<SuggestedStartersProps> = ({
+export const SuggestedStarters = ({
   onSelectPrompt,
   disabled = false,
-}) => {
+}: SuggestedStartersProps) => {
   return (
     <div className="flex flex-col gap-6">
       {/* Welcome Headline Area */}

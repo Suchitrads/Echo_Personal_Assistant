@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, type FormEvent } from 'react';
 import { Message, SessionState } from '../types';
 import { RotateCcw, Send, Sparkles, MessageSquare } from 'lucide-react';
 
@@ -33,7 +33,7 @@ export const ConversationPanel = ({
     setIsUserScrolledUp(!atBottom);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!inputText.trim()) return;
     onSendMessage(inputText.trim());
