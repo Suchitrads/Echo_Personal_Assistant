@@ -1,0 +1,11 @@
+{
+  "name": "Echo — AI Voice Companion",
+  "description": "A friendly voice for curious minds. Real-time spoken conversations powered by Gemini Live.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
+
