@@ -24,6 +24,7 @@ export function useVoiceSession(settings: AppSettings) {
   const speechRecognitionRef = useRef<any>(null);
   const animFrameRef = useRef<number | null>(null);
   const currentAssistantMsgIdRef = useRef<string | null>(null);
+  const currentUserMsgIdRef = useRef<string | null>(null);
   const isMutedRef = useRef(false);
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
@@ -372,12 +373,37 @@ export function useVoiceSession(settings: AppSettings) {
                 ];
               }
             });
+          } else if (msg.type === 'user_text_chunk') {
+            // Streaming transcript text chunk for user speech from Gemini Live
+            const userChunk = msg.text;
+            setMessages((prev) => {
+              const currentUserId = currentUserMsgIdRef.current;
+              if (currentUserId && prev.some((m) => m.id === currentUserId)) {
+                return prev.map((m) =>
+                  m.id === currentUserId ? { ...m, text: m.text + userChunk } : m
+                );
+              } else {
+                const newUserId = `user-${Date.now()}`;
+                currentUserMsgIdRef.current = newUserId;
+                return [
+                  ...prev,
+                  {
+                    id: newUserId,
+                    role: 'user',
+                    text: userChunk,
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  },
+                ];
+              }
+            });
           } else if (msg.type === 'turn_complete') {
             currentAssistantMsgIdRef.current = null;
+            currentUserMsgIdRef.current = null;
           } else if (msg.type === 'interrupted') {
             // User interrupted AI speaking
             playerRef.current?.stop();
             currentAssistantMsgIdRef.current = null;
+            currentUserMsgIdRef.current = null;
             setSessionState(isMutedRef.current ? 'muted' : 'listening');
           } else if (msg.type === 'error') {
             setErrorDetails(msg.message || 'Connection notice.');
@@ -438,6 +464,7 @@ export function useVoiceSession(settings: AppSettings) {
     stopMicrophone();
     setSessionState('ended');
     currentAssistantMsgIdRef.current = null;
+    currentUserMsgIdRef.current = null;
   }, [stopMicrophone]);
 
   // Toggle Mute

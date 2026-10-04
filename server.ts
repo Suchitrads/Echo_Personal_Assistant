@@ -232,6 +232,8 @@ async function startServer() {
                     prebuiltVoiceConfig: { voiceName: selectedVoice },
                   },
                 },
+                outputAudioTranscription: {},
+                inputAudioTranscription: {},
                 systemInstruction: ECHO_SYSTEM_INSTRUCTION,
               },
               callbacks: {
@@ -257,6 +259,26 @@ async function startServer() {
                         })
                       );
                     }
+                  }
+
+                  // 2. Output audio transcription (voice response as text)
+                  if (msg.serverContent?.outputTranscription?.text) {
+                    clientWs.send(
+                      JSON.stringify({
+                        type: 'text_chunk',
+                        text: msg.serverContent.outputTranscription.text,
+                      })
+                    );
+                  }
+
+                  // 3. Input audio transcription (user spoken words as text)
+                  if (msg.serverContent?.inputTranscription?.text) {
+                    clientWs.send(
+                      JSON.stringify({
+                        type: 'user_text_chunk',
+                        text: msg.serverContent.inputTranscription.text,
+                      })
+                    );
                   }
 
                   // 2. Interruption event
