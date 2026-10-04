@@ -5,12 +5,14 @@ interface PandaCharacterProps {
   state: SessionState;
   audioLevel: number; // 0 to 1 (either inputLevel or outputLevel)
   onRetry?: () => void;
+  size?: 'compact' | 'standard';
 }
 
 export const PandaCharacter = ({
   state,
   audioLevel,
   onRetry,
+  size = 'standard',
 }: PandaCharacterProps) => {
   // Determine state-specific visual helpers
   const isListening = state === 'listening';
@@ -60,7 +62,9 @@ export const PandaCharacter = ({
       {/* Soft Ambient Glow / Ripple behind character */}
       <div className="absolute -inset-4 flex items-center justify-center pointer-events-none -z-10">
         <div
-          className={`w-64 h-64 rounded-full transition-all duration-700 ease-out ${
+          className={`rounded-full transition-all duration-700 ease-out ${
+            size === 'compact' ? 'w-32 h-32' : 'w-64 h-64'
+          } ${
             isSpeaking
               ? 'bg-[#79BFA8]/20 scale-110 blur-2xl animate-pulse'
               : isListening
@@ -73,7 +77,9 @@ export const PandaCharacter = ({
         {/* Secondary wave ring when speaking or listening */}
         {(isSpeaking || isListening) && (
           <div
-            className="absolute w-72 h-72 rounded-full border border-[#79BFA8]/30 transition-transform duration-1000"
+            className={`absolute rounded-full border border-[#79BFA8]/30 transition-transform duration-1000 ${
+              size === 'compact' ? 'w-36 h-36' : 'w-72 h-72'
+            }`}
             style={{
               transform: `scale(${1 + audioLevel * 0.25})`,
               opacity: 0.6 + audioLevel * 0.4,
@@ -84,7 +90,9 @@ export const PandaCharacter = ({
 
       {/* SVG 3D Character Illustration */}
       <div
-        className={`relative w-64 h-64 md:w-72 md:h-72 transition-transform duration-500 ${
+        className={`relative transition-transform duration-500 ${
+          size === 'compact' ? 'w-24 h-24 md:w-32 md:h-32' : 'w-60 h-60 md:w-72 md:h-72'
+        } ${
           isConnecting ? 'scale-105' : 'hover:scale-[1.02]'
         }`}
         style={{

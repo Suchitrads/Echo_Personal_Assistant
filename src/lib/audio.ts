@@ -101,6 +101,13 @@ export class StreamingAudioPlayer {
     this.onEndedCallback = callback;
   }
 
+  public resume(): void {
+    this.initContext();
+    if (this.audioCtx && this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume().catch(() => {});
+    }
+  }
+
   /**
    * Enqueues a base64 24kHz 16-bit PCM chunk from Gemini Live
    */

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Shield, Sliders } from 'lucide-react';
+import { X, Shield, Sliders, Download } from 'lucide-react';
 import { AppSettings, VoiceName } from '../types';
 
 interface SettingsModalProps {
@@ -160,19 +160,31 @@ export const SettingsModal = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[#F0EFEB] bg-[#FAF9F6] flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl text-xs font-medium text-[#697386] hover:text-[#202633] transition-colors cursor-pointer"
+        <div className="px-6 py-4 border-t border-[#F0EFEB] bg-[#FAF9F6] flex items-center justify-between gap-3">
+          <a
+            href="/api/download"
+            download="echo-voice-companion.tar.gz"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-[#465163] hover:text-[#202633] bg-white border border-[#E9E8E2] hover:border-[#C7C6BE] shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+            title="Download full project code as .tar.gz archive"
           >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-5 py-2 rounded-xl text-xs font-medium text-white bg-[#79BFA8] hover:bg-[#68B199] shadow-xs transition-colors cursor-pointer"
-          >
-            Apply Changes
-          </button>
+            <Download className="w-3.5 h-3.5 text-[#79BFA8]" />
+            <span>Download Project</span>
+          </a>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl text-xs font-medium text-[#697386] hover:text-[#202633] transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-5 py-2 rounded-xl text-xs font-medium text-white bg-[#79BFA8] hover:bg-[#68B199] shadow-xs transition-colors cursor-pointer"
+            >
+              Apply Changes
+            </button>
+          </div>
         </div>
       </div>
     </div>

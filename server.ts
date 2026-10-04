@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { spawn } from 'child_process';
 import { WebSocketServer, WebSocket } from 'ws';
 import dotenv from 'dotenv';
 import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
@@ -64,6 +65,25 @@ async function startServer() {
       app: 'Echo — AI Voice Companion',
       version: '1.0.0',
     });
+  });
+
+  // Source archive download endpoint
+  app.get('/api/download', (_req, res) => {
+    res.setHeader('Content-Type', 'application/gzip');
+    res.setHeader('Content-Disposition', 'attachment; filename="echo-voice-companion.tar.gz"');
+    const tarProcess = spawn('tar', [
+      '-cz',
+      '--exclude=node_modules',
+      '--exclude=.git',
+      '--exclude=dist',
+      '--exclude=*.tar.gz',
+      '-f',
+      '-',
+      '.'
+    ], { cwd: path.resolve(__dirname) });
+
+    tarProcess.stdout.pipe(res);
+    tarProcess.stderr.on('data', (err) => console.error('Tar error:', err.toString()));
   });
 
   // Direct conversational turn endpoint:

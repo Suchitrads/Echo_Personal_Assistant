@@ -5,7 +5,7 @@ interface SuggestedStartersProps {
   disabled?: boolean;
 }
 
-const STARTERS = [
+export const STARTERS = [
   {
     icon: Compass,
     label: 'Explain a topic simply',

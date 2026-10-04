@@ -1,21 +1,29 @@
-import { useRef, useEffect, useState, type FormEvent } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Message, SessionState } from '../types';
-import { RotateCcw, Send, Sparkles, MessageSquare } from 'lucide-react';
+import { RotateCcw, Sparkles, MessageSquare } from 'lucide-react';
+import { UnifiedInputBar } from './UnifiedInputBar';
 
 interface ConversationPanelProps {
   messages: Message[];
   sessionState: SessionState;
+  isMuted: boolean;
   onSendMessage: (text: string) => void;
   onClear: () => void;
+  onStartVoice: () => void;
+  onEndVoice: () => void;
+  onToggleMute: () => void;
 }
 
 export const ConversationPanel = ({
   messages,
   sessionState,
+  isMuted,
   onSendMessage,
   onClear,
+  onStartVoice,
+  onEndVoice,
+  onToggleMute,
 }: ConversationPanelProps) => {
-  const [inputText, setInputText] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isUserScrolledUp, setIsUserScrolledUp] = useState(false);
 
@@ -31,14 +39,6 @@ export const ConversationPanel = ({
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
     const atBottom = scrollHeight - scrollTop - clientHeight < 40;
     setIsUserScrolledUp(!atBottom);
-  };
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!inputText.trim()) return;
-    onSendMessage(inputText.trim());
-    setInputText('');
-    setIsUserScrolledUp(false);
   };
 
   return (
@@ -60,28 +60,25 @@ export const ConversationPanel = ({
             title="Clear transcript"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset</span>
+            <span>Clear</span>
           </button>
         )}
       </div>
 
-      {/* Messages Scroll Area */}
+      {/* Message List */}
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-4 space-y-3.5 custom-scrollbar min-h-[300px] max-h-[500px]"
+        className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar min-h-[280px] max-h-[500px] lg:max-h-[600px]"
       >
         {messages.length === 0 ? (
-          // Inviting Clean Empty State
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 text-[#697386] select-none my-auto">
-            <div className="w-10 h-10 rounded-full bg-[#FAF9F6] border border-[#E9E8E2] flex items-center justify-center mb-3">
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 text-[#697386] space-y-2.5">
+            <div className="w-10 h-10 rounded-full bg-[#E8F4F0] flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-[#79BFA8]" />
             </div>
-            <p className="text-sm font-medium text-[#202633] mb-1">
-              Your conversation appears here
-            </p>
-            <p className="text-xs text-[#697386] max-w-[220px]">
-              Speak into your microphone or pick a prompt to begin talking with Echo.
+            <p className="text-sm font-medium text-[#202633]">No messages yet</p>
+            <p className="text-xs max-w-xs text-[#697386] leading-relaxed">
+              Start talking or send a message below to begin your conversation with Echo.
             </p>
           </div>
         ) : (
@@ -90,13 +87,13 @@ export const ConversationPanel = ({
             return (
               <div
                 key={msg.id}
-                className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
+                className={`flex flex-col ${
+                  isUser ? 'items-end' : 'items-start'
+                } space-y-1 animate-in fade-in duration-200`}
               >
                 {/* Speaker Label & Timestamp */}
-                <div className="flex items-center gap-2 mb-1 px-1 text-[11px] text-[#697386]">
-                  <span className="font-medium text-[#202633]">
-                    {isUser ? 'You' : 'Echo'}
-                  </span>
+                <div className="flex items-center gap-1.5 text-[11px] text-[#697386] px-1 font-medium">
+                  <span>{isUser ? 'You' : 'Echo'}</span>
                   <span>·</span>
                   <span>{msg.timestamp}</span>
                 </div>
@@ -135,28 +132,19 @@ export const ConversationPanel = ({
         )}
       </div>
 
-      {/* Optional Text Input (Hybrid voice/text capability) */}
-      <form
-        onSubmit={handleSubmit}
-        className="p-3 border-t border-[#F0EFEB] bg-[#FAF9F6]/50 flex items-center gap-2"
-      >
-        <input
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="Or type a message to Echo..."
-          className="flex-1 bg-white border border-[#E2E1DC] rounded-xl px-3.5 py-2 text-xs text-[#202633] placeholder:text-[#697386]/70 focus:outline-none focus:border-[#79BFA8] focus:ring-1 focus:ring-[#79BFA8] transition-all"
+      {/* Merged Input Field: Text and Microphone available at one place */}
+      <div className="p-3 border-t border-[#F0EFEB] bg-[#FAF9F6]/50">
+        <UnifiedInputBar
+          sessionState={sessionState}
+          isMuted={isMuted}
+          onStartVoice={onStartVoice}
+          onEndVoice={onEndVoice}
+          onToggleMute={onToggleMute}
+          onSendMessage={onSendMessage}
+          variant="panel"
+          placeholder="Type or tap Voice..."
         />
-        <button
-          type="submit"
-          disabled={!inputText.trim()}
-          className="p-2 rounded-xl bg-[#79BFA8] text-white hover:bg-[#68B199] disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-          title="Send text to Echo"
-          aria-label="Send message"
-        >
-          <Send className="w-3.5 h-3.5" />
-        </button>
-      </form>
+      </div>
     </div>
   );
 };
